@@ -1,6 +1,9 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import connectToDb from './config/db.js';
+import express from "express";
+import dotenv from "dotenv";
+import connectToDb from "./config/db.js";
+import userRoute from "./routes/userRoute.js";
+import authRoute from "./routes/authRoute.js";
+import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 dotenv.config();
 
 const app = express();
@@ -9,13 +12,10 @@ connectToDb();
 
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
-
-
-
-app.get('/', (req, res) => {
-  res.send('Hello, World!');
-});
-
+app.use("/api/users", userRoute);
+app.use("/api/users", authRoute);
+app.use(notFound);
+app.use(errorHandler);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
