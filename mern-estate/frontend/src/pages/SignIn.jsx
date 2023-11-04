@@ -7,6 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { signInSuccess, signInStart, signInFailure } from "../redux/userSlice";
+import OAuth from "../components/OAuth";
 const SignIn = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,11 +22,20 @@ const SignIn = () => {
   };
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log(formState);
+    if (!formState.email || !formState.password)
+      return toast.error("Please fill all the fields", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     try {
       dispatch(signInStart());
-      const res = await axios.post("/api/users/signin", formState);
-      console.log(res);
+      const res = await axios.post("/api/auth/signin", formState);
       dispatch(signInSuccess(res.data));
       toast("User Logged In!", {
         position: "top-right",
@@ -65,6 +75,7 @@ const SignIn = () => {
             name="email"
             id=""
             placeholder="Email"
+            required
           />
           <input
             onChange={handleInputChange}
@@ -74,6 +85,7 @@ const SignIn = () => {
             name="password"
             id=""
             placeholder="Password"
+            required
           />
           <button
             onClick={handleFormSubmit}
@@ -83,12 +95,7 @@ const SignIn = () => {
             Sign In
           </button>
         </form>
-        <button
-          type="button"
-          className="gradient-background mt-2 text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
-        >
-          Continue with Google
-        </button>
+        <OAuth />
         {loading && <InfinitySpin width="200" color="#4fa94d" />}
         <span className="mt-3 flex text-lg">
           <p className="font-bold">Don't Have an Account?</p>

@@ -5,6 +5,7 @@ import { InfinitySpin } from "react-loader-spinner";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import OAuth from "../components/OAuth";
 const SignUp = () => {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
@@ -22,7 +23,7 @@ const SignUp = () => {
     console.log(formState);
     try {
       setLoading(true);
-      const res = await axios.post("/api/users/signup", formState);
+      const res = await axios.post("/api/auth/signup", formState);
       console.log(res);
       setLoading(false);
       toast("User Signed Up!", {
@@ -88,12 +89,7 @@ const SignUp = () => {
             Sign Up
           </button>
         </form>
-        <button
-          type="button"
-          className="gradient-background mt-2 text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
-        >
-          Continue with Google
-        </button>
+        <OAuth />
         {loading && <InfinitySpin width="200" color="#4fa94d" />}
         <span className="mt-3 flex text-lg">
           <p className="font-bold">Have an Account?</p>

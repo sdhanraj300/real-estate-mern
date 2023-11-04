@@ -13,7 +13,7 @@ connectToDb();
 app.use(express.json()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
 app.use("/api/users", userRoute);
-app.use("/api/users", authRoute);
+app.use("/api/auth", authRoute);
 app.use(notFound);
 app.use(errorHandler);
 app.listen(port, () => {
