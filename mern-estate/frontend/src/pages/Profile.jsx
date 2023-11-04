@@ -12,17 +12,60 @@ import {
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  signOutFailure,
+  signOutStart,
+  signOutSuccess,
 } from "../redux/userSlice";
 import { app } from "../firebase";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { InfinitySpin } from "react-loader-spinner";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 const Profile = () => {
   const dispatch = useDispatch();
   const [file, setFile] = React.useState(undefined);
   const [filePerc, setFilePerc] = React.useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutStart());
+      const res = await axios.get("/api/auth/signout");
+      const data = res.data;
+      if (data.success === false) {
+        dispatch(signOutFailure(data.message));
+        toast.error(data.message);
+        return;
+      }
+      dispatch(signOutSuccess());
+      toast.success(data.message);
+      window.location.href = "/";
+    } catch (error) {
+      toast.error(error.message);
+      dispatch(signOutFailure(error.message));
+    }
+  };
+  const deleteUserHandler = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await axios.delete(`/api/users/delete/${_id}`);
+      const data = await res.data;
+      if (data.success === false) {
+        toast.error(data.message);
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess());
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error.message);
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -114,7 +157,7 @@ const Profile = () => {
             accept="image/*"
           />
           <img
-            className="h-40 w-40 rounded-full"
+            className="h-40 w-40 rounded-full object-cover shadow-md"
             onClick={() => fileRef.current.click()}
             src={formState.avatar || currentUser.avatar}
             alt="profile-img"
@@ -162,17 +205,27 @@ const Profile = () => {
             placeholder="Password"
           />
           <button
+            disabled={loading}
             onClick={handleFormSubmit}
             type="submit"
-            className="bg-blue-900 text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
+            className="bg-blue-900 shadow-md text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
           >
             {loading ? "Updating..." : "Update"}
           </button>
+          <Link to="/createlisting">
+            <button
+              disabled={loading}
+              type="button"
+              className="bg-pink-900 hover:bg-pink-600  shadow-md text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
+            >
+              Create Listing
+            </button>
+          </Link>
         </form>
         {loading && <InfinitySpin width="200" color="#4fa94d" />}
         <div className="flex flex-row gap-5 mt-5">
           <button
-            disabled={loading}  
+            onClick={deleteUserHandler}
             type="button"
             className="text-white font-bold 
             text-lg border-2 bg-red-600 rounded-md h-10 w-40"
@@ -180,6 +233,7 @@ const Profile = () => {
             Delete Account
           </button>
           <button
+            onClick={handleSignOut}
             type="button"
             className="text-white font-bold 
             text-lg border-2 bg-purple-600 rounded-md h-10 w-40"
