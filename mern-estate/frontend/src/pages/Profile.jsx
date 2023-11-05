@@ -30,7 +30,21 @@ const Profile = () => {
   const [file, setFile] = React.useState(undefined);
   const [filePerc, setFilePerc] = React.useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
+  const [userListings, setUserListings] = useState([]);
 
+  const handleShowListings = async () => {
+    console.log(currentUser._id);
+    try {
+      const res = await fetch(`/api/users/listings/${currentUser._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        return;
+      }
+      setUserListings(data);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
   const handleSignOut = async () => {
     try {
       dispatch(signOutStart());
@@ -208,7 +222,7 @@ const Profile = () => {
             disabled={loading}
             onClick={handleFormSubmit}
             type="submit"
-            className="bg-blue-900 shadow-md text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
+            className="bg-blue-900 hover:bg-blue-500 shadow-md text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
           >
             {loading ? "Updating..." : "Update"}
           </button>
@@ -241,6 +255,54 @@ const Profile = () => {
             Sign Out
           </button>
         </div>
+        <button
+          type="button"
+          onClick={handleShowListings}
+          className="text-center rounded-md hover:bg-green-400 text-white w-40 h-10 mt-2 border-2 bg-green-600"
+        >
+          Show Listings
+        </button>
+        {userListings &&
+          userListings.length > 0 &&
+          userListings.map((listing) => (
+            <div
+              className="w-[100%] lg:w-[40%] flex border rounded-lg p-3 gap-4 justify-between items-center mt-1"
+              key={listing._id}
+            >
+              <Link to={`/listing/${listing._id}`}>
+                <img
+                  className="h-16 w-16 object-cover shadow-md"
+                  src={listing.imageUrls[0]}
+                  alt="profile-img"
+                />
+              </Link>
+              <Link
+                to={`/listing/${listing._id}`}
+                className="text-slate-700
+                  font-semibold
+                  flex-1 
+                  hover:underline 
+                  truncate
+                "
+              >
+                <p>{listing.name}</p>
+              </Link>
+              <div className="flex flex-col item-center">
+                <button
+                  className="text-red-700 uppercase
+                  hover:underline
+                  "
+                >
+                  Delete
+                </button>
+                <Link>
+                  <button className="text-green-700 uppercase
+                  hover:underline
+                  ">Edit</button>
+                </Link>
+              </div>
+            </div>
+          ))}
       </div>
       <ToastContainer />
     </div>

@@ -1,8 +1,9 @@
 import Listing from "../models/listingModel.js";
-export const createListing = async (req, res) => {
+import { errorHandler } from "../utils/error.js";
+export const createListing = async (req, res, next) => {
   try {
     const listing = await Listing.create(req.body);
-    res.status(201).json(listing); // 201: Created
+    return res.status(201).json(listing);
   } catch (error) {
     next(error);
   }
