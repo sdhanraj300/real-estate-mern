@@ -32,14 +32,30 @@ const Profile = () => {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [userListings, setUserListings] = useState([]);
 
+  const handleDeleteListing = async (id) => {
+    try {
+      const res = await axios.delete(`/api/listings/delete/${id}`);
+      const data = await res.data;
+      if (data.success === false) {
+        toast.error(data.message);
+        return;
+      }
+      setUserListings(userListings.filter((listing) => listing._id !== id));
+      if(userListings.length === 0){
+        toast.success("No more listings to show");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
   const handleShowListings = async () => {
-    console.log(currentUser._id);
     try {
       const res = await fetch(`/api/users/listings/${currentUser._id}`);
       const data = await res.json();
       if (data.success === false) {
         return;
       }
+
       setUserListings(data);
     } catch (error) {
       toast.error(error.message);
@@ -83,10 +99,27 @@ const Profile = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log(formState);
+
+    // Create a new form state with the existing values
+    const updatedFormState = {
+      email: formState.email,
+      username: formState.username,
+      avatar: formState.avatar,
+    };
+
+    // Include the password field only if it's not empty
+    if (formState.password.trim() !== "") {
+      updatedFormState.password = formState.password;
+    }
+
+    console.log(updatedFormState);
+
     try {
       dispatch(updateUserStart());
-      const res = await axios.post(`/api/users/update/${_id}`, formState);
+      const res = await axios.post(
+        `/api/users/update/${_id}`,
+        updatedFormState
+      );
       const data = await res.data;
       if (data.success === false) {
         dispatch(updateUserFailure(data.message));
@@ -106,21 +139,6 @@ const Profile = () => {
       handleFileUpload(file);
     }
   }, [file]);
-  //   {
-  //     rules_version = '2';
-
-  // // Craft rules based on data in your Firestore database
-  // // allow write: if firestore.get(
-  // //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
-  // service firebase.storage {
-  //   match /b/{bucket}/o {
-  //     match /{allPaths=**} {
-  //       allow read;
-  //       allow write: if request.source.size < 2*1024 &&
-  //       request.source.contentType.matches('image/.*');
-  //     }
-  //   }
-  // }
   const fileRef = useRef(null);
   const notify = () => toast.success("Profile Updated Successfully");
   const handleFileUpload = (file) => {
@@ -256,7 +274,6 @@ const Profile = () => {
           </button>
         </div>
         <button
-          type="button"
           onClick={handleShowListings}
           className="text-center rounded-md hover:bg-green-400 text-white w-40 h-10 mt-2 border-2 bg-green-600"
         >
@@ -269,7 +286,7 @@ const Profile = () => {
               className="w-[100%] lg:w-[40%] flex border rounded-lg p-3 gap-4 justify-between items-center mt-1"
               key={listing._id}
             >
-              <Link to={`/listing/${listing._id}`}>
+              <Link>
                 <img
                   className="h-16 w-16 object-cover shadow-md"
                   src={listing.imageUrls[0]}
@@ -289,16 +306,23 @@ const Profile = () => {
               </Link>
               <div className="flex flex-col item-center">
                 <button
+                  onClick={() => handleDeleteListing(listing._id)}
+                  type="button"
                   className="text-red-700 uppercase
                   hover:underline
                   "
                 >
                   Delete
                 </button>
-                <Link>
-                  <button className="text-green-700 uppercase
+                <Link to={`/updatelisting/${listing._id}`}>
+                  <button
+                    type="button"
+                    className="text-green-700 uppercase
                   hover:underline
-                  ">Edit</button>
+                  "
+                  >
+                    Edit
+                  </button>
                 </Link>
               </div>
             </div>

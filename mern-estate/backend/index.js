@@ -17,7 +17,7 @@ app.use(cookieParser()); // Parse JSON request bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bodies
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
-app.use("/api/listing", listingRoute);
+app.use("/api/listings", listingRoute);
 app.use(notFound);
 app.use(errorHandler);
 app.listen(port, () => {

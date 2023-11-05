@@ -1,6 +1,6 @@
 import bcryptjs from "bcryptjs";
 import User from "../models/UserModel.js";
-import listing from "../models/listingModel.js";
+import Listing from "../models/listingModel.js";
 import { errorHandler } from "../utils/error.js";
 
 export const testUser = (req, res) => {
@@ -39,9 +39,10 @@ export const updateUser = async (req, res, next) => {
 };
 
 export const getUserListings = async (req, res, next) => {
+  console.log(req.user.id, req.params.id);
   if (req.user.id === req.params.id) {
     try {
-      const listings = await listing.find({ userRef: req.params.id });
+      const listings = await Listing.find({ userRef: req.params.id });
       res.status(200).json(listings);
     } catch (error) {
       next(error);
@@ -58,6 +59,17 @@ export const deleteUser = async (req, res, next) => {
     await User.findByIdAndDelete(req.params.id);
     res.clearCookie("access_token");
     res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return next(errorHandler(404, "User not found!"));
+    const { password: pass, ...rest } = user._doc;
+    res.status(200).json(rest);
   } catch (error) {
     next(error);
   }
