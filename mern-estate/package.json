@@ -29,5 +29,9 @@
     "redux": "^4.2.1",
     "redux-persist": "^6.0.0",
     "toastify": "^2.0.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.2",
+    "@babel/preset-env": "^7.23.2"
   }
 }
