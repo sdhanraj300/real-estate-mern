@@ -9,6 +9,8 @@ import listingRoute from "./routes/listingRoute.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 dotenv.config();
 
+const __dirname = path.resolve();
+
 const app = express();
 const port = process.env.PORT || 8000;
 connectToDb();
@@ -19,6 +21,12 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request bo
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/listings", listingRoute);
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "/frontend/dist/index.html"));
+});
+
 app.use(notFound);
 app.use(errorHandler);
 app.listen(port, () => {
