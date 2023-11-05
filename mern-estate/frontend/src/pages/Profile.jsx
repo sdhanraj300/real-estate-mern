@@ -25,6 +25,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { InfinitySpin } from "react-loader-spinner";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+
 const Profile = () => {
   const dispatch = useDispatch();
   const [file, setFile] = React.useState(undefined);
@@ -41,7 +42,7 @@ const Profile = () => {
         return;
       }
       setUserListings(userListings.filter((listing) => listing._id !== id));
-      if(userListings.length === 0){
+      if (userListings.length === 0) {
         toast.success("No more listings to show");
       }
     } catch (error) {
@@ -175,159 +176,136 @@ const Profile = () => {
   });
   const handleInputChange = (e) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
-  };
+  };  
   return (
-    <div className="items-center justify-center">
-      <div className="flex items-center flex-col mt-20">
-        <h1 className="text-4xl text-slate-600 font-bold">Profile</h1>
-        <form action="POST" className="flex flex-col items-center mt-10 gap-2">
-          <input
-            onChange={(e) => setFile(e.target.files[0])}
-            type="file"
-            ref={fileRef}
-            hidden
-            accept="image/*"
-          />
-          <img
-            className="h-40 w-40 rounded-full object-cover shadow-md"
-            onClick={() => fileRef.current.click()}
-            src={formState.avatar || currentUser.avatar}
-            alt="profile-img"
-          />
-          <p className="text-sm self-center">
-            {fileUploadError ? (
-              <span className="text-red-700">
-                Error Image upload (image must be less than 2 mb)
-              </span>
-            ) : filePerc > 0 && filePerc < 100 ? (
-              <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
-            ) : filePerc === 100 ? (
-              <span className="text-green-700">
-                Image successfully uploaded!
-              </span>
-            ) : (
-              ""
-            )}
-          </p>
-          <input
-            onChange={handleInputChange}
-            value={formState.username}
-            className="border-2 border-slate-400 rounded-md h-[3rem] w-[30rem] shadow-md p-5"
-            type="text"
-            name="username"
-            id=""
-            required
-          />
-          <input
-            onChange={handleInputChange}
-            value={formState.email}
-            className="border-2 border-slate-400 rounded-md h-[3rem] w-[30rem] shadow-md p-5"
-            type="email"
-            name="email"
-            id=""
-            required
-          />
-          <input
-            onChange={handleInputChange}
-            value={formState.password}
-            className="border-2 border-slate-400 rounded-md h-[3rem] w-[30rem] shadow-md p-5"
-            type="password"
-            name="password"
-            id=""
-            placeholder="Password"
-          />
+    <div className="flex flex-col items-center justify-center p-5">
+      <h1 className="text-4xl text-slate-600 font-bold">Profile</h1>
+      <div className="flex flex-col items-center mt-10 gap-2">
+        <img
+          className="h-40 w-40 rounded-full object-cover shadow-md cursor-pointer"
+          onClick={() => fileRef.current.click()}
+          src={formState.avatar || currentUser.avatar}
+          alt="profile-img"
+        />
+        <p className="text-sm text-center">
+          {fileUploadError ? (
+            <span className="text-red-700">
+              Error Image upload (image must be less than 2MB)
+            </span>
+          ) : filePerc > 0 && filePerc < 100 ? (
+            <span className="text-slate-700">{`Uploading ${filePerc}%`}</span>
+          ) : filePerc === 100 ? (
+            <span className="text-green-700">Image successfully uploaded!</span>
+          ) : (
+            ""
+          )}
+        </p>
+        <input
+          onChange={handleInputChange}
+          value={formState.username}
+          className="border-2 border-slate-400 rounded-md h-12 w-80 sm:w-[30rem] shadow-md p-5"
+          type="text"
+          name="username"
+          required
+        />
+        <input
+          onChange={handleInputChange}
+          value={formState.email}
+          className="border-2 border-slate-400 rounded-md h-12 w-80 sm:w-[30rem] shadow-md p-5"
+          type="email"
+          name="email"
+          required
+        />
+        <input
+          onChange={handleInputChange}
+          value={formState.password}
+          className="border-2 border-slate-400 rounded-md h-12 w-80 sm:w-[30rem] shadow-md p-5"
+          type="password"
+          name="password"
+          placeholder="Password"
+        />
+        <button
+          disabled={loading}
+          onClick={handleFormSubmit}
+          type="submit"
+          className="bg-blue-900 hover:bg-blue-500 shadow-md text-white w-80 sm:w-[30rem] h-12 p-1 font-bold rounded-md"
+        >
+          {loading ? "Updating..." : "Update"}
+        </button>
+        <Link to="/createlisting">
           <button
             disabled={loading}
-            onClick={handleFormSubmit}
-            type="submit"
-            className="bg-blue-900 hover:bg-blue-500 shadow-md text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
+            type="button"
+            className="bg-pink-900 hover:bg-pink-600 shadow-md text-white w-80 sm:w-[30rem] h-12 p-1 font-bold rounded-md"
           >
-            {loading ? "Updating..." : "Update"}
+            Create Listing
           </button>
-          <Link to="/createlisting">
-            <button
-              disabled={loading}
-              type="button"
-              className="bg-pink-900 hover:bg-pink-600  shadow-md text-white w-[30rem] h-[3rem] p-1 font-bold rounded-md"
-            >
-              Create Listing
-            </button>
-          </Link>
-        </form>
-        {loading && <InfinitySpin width="200" color="#4fa94d" />}
-        <div className="flex flex-row gap-5 mt-5">
+        </Link>
+        {loading && <InfinitySpin width={80} color="#4fa94d" />}
+        <div className="flex flex-col sm:flex-row gap-5 mt-5">
           <button
             onClick={deleteUserHandler}
             type="button"
-            className="text-white font-bold 
-            text-lg border-2 bg-red-600 rounded-md h-10 w-40"
+            className="text-white font-bold text-lg border-2 bg-red-600 rounded-md h-12 w-40 sm:w-80"
           >
             Delete Account
           </button>
           <button
             onClick={handleSignOut}
             type="button"
-            className="text-white font-bold 
-            text-lg border-2 bg-purple-600 rounded-md h-10 w-40"
+            className="text-white font-bold text-lg border-2 bg-purple-600 rounded-md h-12 w-40 sm:w-80"
           >
             Sign Out
           </button>
         </div>
         <button
           onClick={handleShowListings}
-          className="text-center rounded-md hover:bg-green-400 text-white w-40 h-10 mt-2 border-2 bg-green-600"
+          className="text-center rounded-md hover:bg-green-400 text-white w-80 sm:w-40 h-12 p-1 border-2 bg-green-600"
         >
           Show Listings
         </button>
-        {userListings &&
-          userListings.length > 0 &&
-          userListings.map((listing) => (
-            <div
-              className="w-[100%] lg:w-[40%] flex border rounded-lg p-3 gap-4 justify-between items-center mt-1"
-              key={listing._id}
-            >
-              <Link>
-                <img
-                  className="h-16 w-16 object-cover shadow-md"
-                  src={listing.imageUrls[0]}
-                  alt="profile-img"
-                />
-              </Link>
+      </div>
+      {userListings &&
+        userListings.length > 0 &&
+        userListings.map((listing) => (
+          <div
+            className="w-full sm:w-[40%] flex flex-col sm:flex-row border rounded-lg p-3 gap-4 justify-between items-center mt-3"
+            key={listing._id}
+          >
+            <Link to={`/listing/${listing._id}`}>
+              <img
+                className="h-20 w-20 sm:h-16 sm:w-16 object-cover shadow-md"
+                src={listing.imageUrls[0]}
+                alt="listing-img"
+              />
+            </Link>
+            <div className="flex flex-col sm:flex-row sm:items-center items-center">
               <Link
                 to={`/listing/${listing._id}`}
-                className="text-slate-700
-                  font-semibold
-                  flex-1 
-                  hover:underline 
-                  truncate
-                "
+                className="text-slate-700 font-semibold flex-1 hover:underline truncate"
               >
-                <p>{listing.name}</p>
+                {listing.name}
               </Link>
-              <div className="flex flex-col item-center">
+              <div className="flex gap-3">
                 <button
                   onClick={() => handleDeleteListing(listing._id)}
                   type="button"
-                  className="text-red-700 uppercase
-                  hover:underline
-                  "
+                  className="text-red-700 uppercase hover:underline"
                 >
                   Delete
                 </button>
                 <Link to={`/updatelisting/${listing._id}`}>
                   <button
                     type="button"
-                    className="text-green-700 uppercase
-                  hover:underline
-                  "
+                    className="text-green-700 uppercase hover:underline"
                   >
                     Edit
                   </button>
                 </Link>
               </div>
             </div>
-          ))}
-      </div>
+          </div>
+        ))}
       <ToastContainer />
     </div>
   );

@@ -1,26 +1,34 @@
-import React, { useEffect } from "react";
-import { FaSearch } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaSearch, FaBars } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 const Header = () => {
   const { currentUser } = useSelector((state) => state.user);
-  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(searchTerm);
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set("searchTerm", searchTerm);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
     if (searchTermFromUrl) setSearchTerm(searchTermFromUrl);
   }, [location.search]);
+
   return (
-    <header className="shadow-md bg-blue-100">
+    <header className="shadow-md bg-blue-100 w-full">
       <div className="flex justify-between p-3 items-center max-w-6xl mx-auto font-bold">
         <Link to="/">
           <h1 className="text-sm font-bold sm:text-2xl flex flex-wrap">
@@ -44,7 +52,7 @@ const Header = () => {
             <FaSearch />
           </button>
         </form>
-        <ul className="flex justify-between gap-4 text-xl">
+        <div className="flex items-center gap-4 text-xl">
           <Link to="/">
             <li className="hidden sm:inline text-slate-700 hover:underline">
               Home
@@ -61,15 +69,31 @@ const Header = () => {
                 src={currentUser.avatar}
                 className="h-8 w-8 rounded-full object-cover"
                 alt="profile-img"
-              ></img>
+              />
             ) : (
               <li className="hidden sm:inline text-slate-700 hover:underline">
                 Sign In
               </li>
             )}
           </Link>
-        </ul>
+          <div className="sm:hidden">
+            <FaBars
+              className="text-2xl cursor-pointer"
+              onClick={toggleMobileMenu}
+            />
+          </div>
+        </div>
       </div>
+      {isMobileMenuOpen && (
+        <ul className="flex flex-col justify-center items-center text-2xl">
+          <Link to="/">
+            <li className="text-slate-700 hover:underline">Home</li>
+          </Link>
+          <Link to="/about">
+            <li className="text-slate-700 hover:underline">About</li>
+          </Link>
+        </ul>
+      )}
     </header>
   );
 };
