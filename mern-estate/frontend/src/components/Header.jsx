@@ -84,6 +84,7 @@ const Header = () => {
           </div>
         </div>
       </div>
+      {/* mobile menu */}
       {isMobileMenuOpen && (
         <ul className="flex flex-col justify-center items-center text-2xl">
           <Link to="/">
